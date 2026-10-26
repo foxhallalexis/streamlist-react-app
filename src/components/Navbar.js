@@ -12,7 +12,7 @@ function Navbar() {
                 className="navbar-logo-img"
             />
             <ul className="nav-links">
-                <li><Link to="/" className={location.pathname === "/" ? "nav-link active" : "nav-link"}>
+                <li><Link to="/streamlist" className={location.pathname === "/streamlist" ? "nav-link active" : "nav-link"}>
                     <span className="material-symbols-rounded nav-icon">home</span>
                     Home
                 </Link></li>
@@ -27,6 +27,10 @@ function Navbar() {
                 <li><Link to="/about" className={location.pathname === "/about" ? "nav-link active" : "nav-link"}>
                     <span className="material-symbols-rounded nav-icon">help</span>
                     About
+                </Link></li>
+                <li><Link to="/" className="nav-link">
+                    <span className="material-symbols-rounded nav-icon">logout</span>
+                    Log Out
                 </Link></li>
             </ul>
         </nav>

@@ -1,20 +1,34 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import Navbar from "./components/Navbar";
+import Login from "./components/Login";
 import StreamList from "./components/StreamList";
 import Movies from "./components/Movies";
 import Cart from "./components/Cart";
 import About from "./components/About";
 
-function App() {
+function AppContent() {
+    const location = useLocation();
+
+    const isLoginPage = location.pathname === "/";
+
     return (
-        <Router>
-            <Navbar />
+        <>
+            {!isLoginPage && <Navbar />}
             <Routes>
-                <Route path="/" element={<StreamList />} />
+                <Route path="/" element={<Login />} />
+                <Route path="/streams" element={<StreamList />} />
                 <Route path="/movies" element={<Movies />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/about" element={<About />} />
             </Routes>
+        </>
+    );
+}
+
+function App() {
+    return (
+        <Router>
+            <AppContent />
         </Router>
     );
 }
