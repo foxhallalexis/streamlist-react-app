@@ -16,7 +16,7 @@ function AppContent() {
             {!isLoginPage && <Navbar />}
             <Routes>
                 <Route path="/" element={<Login />} />
-                <Route path="/streams" element={<StreamList />} />
+                <Route path="/streamlist" element={<StreamList />} />
                 <Route path="/movies" element={<Movies />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/about" element={<About />} />
