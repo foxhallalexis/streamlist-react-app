@@ -25,9 +25,8 @@ function Login() {
         <div className="login-page">
             <div className="login-card">
                 <div className="login-header">
-                    <span className="material-symbols-rounded login-icon">
-                        movie
-                    </span>
+                    <img src={process.env.PUBLIC_URL + "/eztechmovielogo1.png"} 
+                    alt="EZTechMovie Logo" className="login-logo"/>
 
                     <h1>Welcome to StreamList!</h1>
                     <p> Sign in to manage the movies and shows you want to watch.</p>

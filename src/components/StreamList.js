@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./StreamList.css";
 
 function StreamList() {
     const [item, setItem] = useState("");
-    const [list, setList] = useState([]);
+    const [list, setList] = useState(() => {
+        const savedList = localStorage.getItem("streamList");
+        return savedList ? JSON.parse(savedList) : [];
+    });
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
+
+    useEffect(() => {
+        localStorage.setItem("streamList", JSON.stringify(list));
+    }, [list]);
 
     // Add a new movie or show
     const handleSubmit = (e) => {

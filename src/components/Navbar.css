@@ -1,59 +1,200 @@
+/* =======================   
+NAVBAR
+======================= */
 .navbar {
-    background-color: var(--bg-alt);
-    padding: 1rem 2rem;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border-color);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  min-height: 90px;
+  padding: 0.75rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background:
+    linear-gradient(
+      90deg,
+      #120d0d 0%,
+      #1b100f 55%,
+      #21110e 100%
+    );
+  border-bottom: 1px solid var(--border);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.35),
+    0 1px 0 rgba(216, 91, 31, 0.08);
 }
 
-.navbar-logo {
-    color: var(--text);
-    font-size: 1.6rem;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-.navbar-links {
-    list-style: none;
-    display: flex;
-    gap: 2rem;
-    margin: 0;
-    padding: 0;
+
+/* =======================   
+LOGO
+======================= */
+.navbar-logo-img {
+  height: 75px;
+  width: auto;
+  object-fit: contain;
+  transition:
+    transform 0.25s ease,
+    filter 0.25s ease;
 }
 
+.navbar-logo-img:hover {
+  transform: scale(1.03);
+  filter:
+    drop-shadow(0 0 8px rgba(240, 119, 50, 0.25));
+}
+
+
+/* =======================   
+NAVIGATION LIST
+======================= */
+.nav-links {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+}
+.nav-links li {
+  margin: 0;
+  padding: 0;
+}
+
+
+/* =======================   
+NAVIGATION LINKS
+======================= */
 .nav-link {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 500;
-    transition: var(--transition);
-    padding-bottom: 4px;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.7rem 0.9rem;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .nav-link:hover {
-    color: var(--accent);
+  color: var(--orange);
+  background-color:
+    rgba(216, 91, 31, 0.08);
+  transform: translateY(-1px);
 }
 
+
+/* =======================   
+ACTIVE PAGE
+======================= */
 .nav-link.active {
-    color: var(--text);
-    font-weight: 700;
-    border-bottom: 2px solid var(--accent);
+  color: var(--yellow);
+  background-color:
+    rgba(233, 162, 59, 0.08);
+  font-weight: 650;
 }
 
+
+/* Small underline below active page */
+
+.nav-link.active::after {
+  content: "";
+  position: absolute;
+  left: 15%;
+  right: 15%;
+  bottom: 3px;
+  height: 2px;
+  border-radius: 10px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--burnt-orange),
+      var(--gold)
+    );
+  box-shadow:
+    0 0 7px rgba(233, 162, 59, 0.25);
+}
+
+
+/* =======================   
+NAVIGATION ICONS
+======================= */
 .nav-icon {
   font-size: 20px;
-  margin-right: 6px;
-  vertical-align: middle;
+  color: inherit;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+.nav-link:hover .nav-icon {
+  transform: translateY(-1px);
+}
+.nav-link.active .nav-icon {
+  color: var(--gold);
 }
 
-.navbar-brand {
-  display: flex;
-  align-items: center;
+
+/* =======================   
+LOGOUT
+======================= */
+.nav-links li:last-child .nav-link {
+  margin-left: 0.5rem;
+  color: #cfaaa4;
+  border-left: 1px solid var(--border);
+  border-radius: 0;
+  padding-left: 1.25rem;
 }
 
-.navbar-logo-img {
-  height: 100px;
-  width: auto;
-  margin-right: 1rem;
+.nav-links li:last-child .nav-link:hover {
+  color: #f0a08f;
+  background-color: transparent;
+}
+
+
+/* =======================   
+RESPONSIVE
+======================= */
+@media (max-width: 800px) {
+
+  .navbar {
+    padding: 0.75rem 1rem;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+
+  .navbar-logo-img {
+    height: 65px;
+  }
+
+  .nav-links {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+  }
+
+  .nav-link {
+    padding: 0.6rem 0.7rem;
+    font-size: 0.9rem;
+  }
+
+  .nav-links li:last-child .nav-link {
+    margin-left: 0;
+    border-left: none;
+    padding-left: 0.7rem;
+  }
+}
+
+@media (max-width: 500px) {
+
+  .nav-link {
+    flex-direction: column;
+    gap: 0.15rem;
+    font-size: 0.75rem;
+  }
+  .nav-icon {
+    font-size: 22px;
+  }
 }
