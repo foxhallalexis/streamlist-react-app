@@ -3,6 +3,10 @@ import "./StreamList.css";
 
 function StreamList() {
     const [item, setItem] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [searching, setSearching] = useState(false);
+    const token = process.env.REACT_APP_TMDB_TOKEN;
+
     const [list, setList] = useState(() => {
         const savedList = localStorage.getItem("streamList");
         return savedList ? JSON.parse(savedList) : [];
@@ -15,19 +19,53 @@ function StreamList() {
     }, [list]);
 
     // Add a new movie or show
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (item.trim() === "") return;
 
-        const newMovie = {
-            id: Date.now(),
-            title: item.trim(),
+        setSearching(true);
+        try {
+            const response = await fetch(
+                `https://api.themoviedb.org/3/search/multi?api_key=${token}&query=${encodeURIComponent(item)}&include_adult=false&language=en-US&page=1`,
+                {
+                    headers: {
+                        accept: "application/json",
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error("Could not search for movies.");
+                }
+                setSearchResults(data.results || []);
+                } catch (error) {
+                    console.error("TMDB Search Error:", error);
+                    setSearchResults([]);
+                } finally {
+                    setSearching(false);
+                }
+    };
+
+    const addMovieFromSearch = (movie) => {
+        const alreadyExists = list.some((m) => m.id === movie.id);
+        if (alreadyExists) {
+            alert("This movie is already in your StreamList.");
+            return;
+        }
+        const movieToAdd = {
+            id: movie.id,
+            title: movie.title || movie.name,
+            release_date: movie.release_date,
+            poster_path: movie.poster_path,
             watched: false,
             rating: null
         };
+        setList((previousList) => [...previousList, movieToAdd]);
 
-        setList((previousList) => [...previousList, newMovie]);
+        setSearchResults([]);
         setItem("");
     };
 
@@ -164,6 +202,52 @@ function StreamList() {
                 </button>
             </form>
 
+            {searching && (
+                <p className="searching-text">
+                    Searching for "{item}"...
+                </p>
+            )}
+
+            {searchResults.length > 0 && (
+    <div className="search-results">
+        {searchResults.slice(0, 5).map((movie) => (
+            <div
+                key={movie.id}
+                className="search-result-item"
+            >
+                {movie.poster_path && (
+                    <img
+                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                        alt={`${movie.title} poster`}
+                        className="search-result-poster"
+                    />
+                )}
+
+                <div className="search-result-info">
+                    <p>{movie.title}</p>
+
+                    {movie.release_date && (
+                        <span>
+                            {movie.release_date.substring(0, 4)}
+                        </span>
+                    )}
+                </div>
+
+                <button
+                    type="button"
+                    className="search-add-btn"
+                    onClick={() => addMovieFromSearch(movie)}
+                >
+                    <span className="material-symbols-rounded">
+                        add
+                    </span>
+                    Add to Watch List
+                </button>
+            </div>
+        ))}
+    </div>
+)}
+
             {/* Want to Watch */}
             <section className="list-section">
                 <h2 className="section-title">
@@ -183,6 +267,13 @@ function StreamList() {
                             className="card streamlist-card"
                         >
                             <div className="movie-information">
+                                {movie.poster_path && (
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                                        alt={`${movie.title} poster`}
+                                        className="movie-poster"
+                                    />
+                                )}
                                 {renderMovieTitle(movie)}
                             </div>
 
@@ -259,6 +350,13 @@ function StreamList() {
                             className="card streamlist-card watched-card"
                         >
                             <div className="movie-information">
+                                {movie.poster_path && (
+                                    <img
+                                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
+                                        alt={`${movie.title} poster`}
+                                        className="movie-poster"
+                                    />
+                                )}
                                 {renderMovieTitle(movie)}
 
                                 {editingId !== movie.id && (

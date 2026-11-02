@@ -3,6 +3,7 @@ import Navbar from "./components/Navbar";
 import Login from "./components/Login";
 import StreamList from "./components/StreamList";
 import Movies from "./components/Movies";
+import Subscriptions from "./components/Subscriptions";
 import Cart from "./components/Cart";
 import About from "./components/About";
 
@@ -18,6 +19,7 @@ function AppContent() {
                 <Route path="/" element={<Login />} />
                 <Route path="/streamlist" element={<StreamList />} />
                 <Route path="/movies" element={<Movies />} />
+                <Route path="/subscriptions" element={<Subscriptions />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/about" element={<About />} />
             </Routes>

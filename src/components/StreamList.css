@@ -136,6 +136,20 @@ MOVIE CARD
         0 0 15px rgba(216, 91, 31, 0.25);
 }
 
+.movie-poster {
+    width: 90px;
+    height: 135px;
+    object-fit: cover;
+    border-radius: 8px;
+    flex-shrink: 0;
+}
+
+.movie-information {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
 /* =====================
 WATCHED CARD
 ===================== */
@@ -368,4 +382,106 @@ MOBILE
     .rating-form {
         align-items: flex-start;
     }
+
+    @media (max-width: 600) {
+        .search-results-item {
+            flex-wrap: wrap;
+        }
+        .search-result-info {
+            flex: 1;
+        }
+        .search-add-btn {
+            width: 100%;
+        }
+    }
+}
+
+/* =====================
+TMDB SEARCH RESULTS
+===================== */
+.searching-text {
+    text-align: center;
+    color: var(--text-muted);
+    margin: -1.5rem 0 1.5rem;
+}
+
+.search-results {
+    max-width: 750px;
+    margin: -1.5rem auto 3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+/* individual search result card */
+.search-result-item {
+    dispaly: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    background:
+        linear-gradient(
+            110deg,
+            var(--surface) 0%,
+            #1e1413 100%
+        );
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        transition: 0.2s ease;
+}
+
+.search-result-item:hover {
+    border-color: var(--burnt-orange);
+    background: var(--surface-light);
+}
+
+/* movie poster in search result */
+.search-result-poster {
+    width: 60px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+/* movie information in search result */
+.search-result-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.search-result-info p {
+    margin: 0 0 0.3rem;
+    color: var(--text);
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.search-result-info span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+/* add to watch list button in search result */
+.search-add-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    background: linear-gradient(
+        135deg,
+        var(--dark-red),
+        var(--burnt-orange)
+    );
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.search-add-btn:hover {
+    background: linear-gradient(
+        135deg,
+        var(--red),
+        var(--orange)
+    );
 }

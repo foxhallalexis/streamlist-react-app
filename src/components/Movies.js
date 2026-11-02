@@ -11,6 +11,36 @@ function Movies() {
     const [loading, setLoading] = useState(true);
     const [searching, setSearching] = useState(false);
     const [error, setError] = useState("");
+    const [watchList, setWatchList] = useState(() => {
+      const savedList = localStorage.getItem("streamList");
+      return savedList ? JSON.parse(savedList) : [];
+    });
+    const merchProducts = [
+      {
+        id: "merch-1",
+        name: "EZTechMovie t-shirt",
+        price: 19.99,
+        icon: "apparel"
+      },
+      {
+        id: "merch-2",
+        name: "Movie Popcorn Bucket",
+        price: 15.99,
+        icon: "local_mall"
+      },
+      {
+        id: "merch-3",
+        name: "Movie Poster",
+        price: 9.99,
+        icon: "image"
+      },
+      {
+        id: "merch-4",
+        name: "Movie Night Bundle",
+        price: 24.99,
+        icon: "redeem"
+      }
+    ];
 
     const token = process.env.REACT_APP_TMDB_TOKEN;
 
@@ -152,6 +182,43 @@ function Movies() {
         setSearching(false);
     }
     };
+const addToCart = (product) => {
+  const savedCart = localStorage.getItem("cart");
+  const cart = savedCart ? JSON.parse(savedCart) : [];
+  const existingProduct = cart.find(
+    (item) => item.id === product.id
+  );
+  if (existingProduct) {
+    existingProduct.quantity += 1;
+  } else {
+    cart.push({
+      ...product,
+      quantity: 1
+    });
+  }
+  localStorage.setItem("cart", JSON.stringify(cart));
+}; 
+ /* Add To Watch List */
+const addToWatchList = (movie) => {
+  const alreadyAdded = watchList.some(
+    (item) => item.id === movie.id
+  );
+  if (alreadyAdded) {
+    return;
+  }
+  const movieToSave = {
+    id: movie.id,
+    title: movie.title,
+    release_date: movie.release_date,
+    poster_path: movie.poster_path,
+    vote_average: movie.vote_average,
+    watched: false,
+    rating: null,
+  };
+  const updatedList = [...watchList, movieToSave];
+  setWatchList(updatedList);
+  localStorage.setItem("streamList", JSON.stringify(updatedList));
+  };
 
 /* Reusable movie card */
 const renderMovieCard = (movie) => (
@@ -171,8 +238,32 @@ const renderMovieCard = (movie) => (
 
                 <p>⭐ {movie.vote_average?.toFixed(1) || "N/A"}</p>
             </div>
+            <button className="watchList-button"
+            onClick={() => addToWatchList(movie)}
+            disable={watchList.some((item) => item.id === movie.id)}>
+              {watchList.some((item) => item.id === movie.id)
+                ? "Added"
+                : "Add to Watch List"
+              }
+            </button>
     </div>
 );
+
+const renderMerchCard = (product) => (
+  <div className="merch-card" key={product.id}>
+    <div className="merch-icon">
+      <span className="material-symbols-rounded">{product.icon}</span>
+    </div>
+    <div className="merch-card-info">
+     <h3>{product.name}</h3>
+      <p className="merch-price">${product.price.toFixed(2)}</p>
+      <button className="add-cart-button"
+      onClick={() => addToCart(product)}>
+        Add to Cart
+      </button>
+    </div>
+  </div>
+)
 
     return (
         <main className="movies-page">
@@ -244,6 +335,12 @@ const renderMovieCard = (movie) => (
         <div className="movie-grid">
             {topRatedMovies.map(renderMovieCard)}
         </div>
+    </section>
+    <section className="movie-section">
+      <h2>Movie Merch</h2>
+      <div className="merch-grid">
+        {merchProducts.map(renderMerchCard)}
+      </div>
     </section>
   </>
 )}
