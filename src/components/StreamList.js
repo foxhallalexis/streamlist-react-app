@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import "./StreamList.css";
+import MovieCard from "./MovieCard";
 
 function StreamList() {
     const [item, setItem] = useState("");
@@ -9,7 +10,14 @@ function StreamList() {
 
     const [list, setList] = useState(() => {
         const savedList = localStorage.getItem("streamList");
-        return savedList ? JSON.parse(savedList) : [];
+        if (!savedList) return [];
+        try {
+            return JSON.parse(savedList);
+        } catch (error) {
+            console.error("Corrupted streamList in localStorage, resetting:", error);
+            localStorage.removeItem("streamList");
+            return [];
+        }
     });
     const [editingId, setEditingId] = useState(null);
     const [editText, setEditText] = useState("");
@@ -24,10 +32,16 @@ function StreamList() {
 
         if (item.trim() === "") return;
 
+        if (!token) {
+            console.error("TMDB token is missing. Set REACT_APP_TMDB_TOKEN in your .env file.");
+            setSearchResults([]);
+            return;
+        }
+
         setSearching(true);
         try {
             const response = await fetch(
-                `https://api.themoviedb.org/3/search/multi?api_key=${token}&query=${encodeURIComponent(item)}&include_adult=false&language=en-US&page=1`,
+                `https://api.themoviedb.org/3/search/multi?query=${encodeURIComponent(item)}&include_adult=false&language=en-US&page=1`,
                 {
                     headers: {
                         accept: "application/json",
@@ -130,47 +144,7 @@ function StreamList() {
     const moviesToWatch = list.filter((movie) => !movie.watched);
     const watchedMovies = list.filter((movie) => movie.watched);
 
-    // Display either the movie title or the editing form
-    const renderMovieTitle = (movie) => {
-        if (editingId === movie.id) {
-            return (
-                <div className="edit-form">
-                    <input
-                        type="text"
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                        aria-label={`Edit ${movie.title}`}
-                    />
 
-                    <button
-                        type="button"
-                        className="icon-btn save-btn"
-                        onClick={() => handleSaveEdit(movie.id)}
-                        title="Save changes"
-                        aria-label="Save changes"
-                    >
-                        <span className="material-symbols-rounded">
-                            save
-                        </span>
-                    </button>
-
-                    <button
-                        type="button"
-                        className="icon-btn cancel-btn"
-                        onClick={handleCancelEdit}
-                        title="Cancel editing"
-                        aria-label="Cancel editing"
-                    >
-                        <span className="material-symbols-rounded">
-                            close
-                        </span>
-                    </button>
-                </div>
-            );
-        }
-
-        return <p className="movie-title">{movie.title}</p>;
-    };
 
     return (
         <div className="container streamlist-container">
@@ -262,71 +236,20 @@ function StreamList() {
                     )}
 
                     {moviesToWatch.map((movie) => (
-                        <div
+                        <MovieCard
                             key={movie.id}
-                            className="card streamlist-card"
-                        >
-                            <div className="movie-information">
-                                {movie.poster_path && (
-                                    <img
-                                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                                        alt={`${movie.title} poster`}
-                                        className="movie-poster"
-                                    />
-                                )}
-                                {renderMovieTitle(movie)}
-                            </div>
-
-                            {editingId !== movie.id && (
-                                <div className="movie-actions">
-
-                                    {/* Mark movie watched */}
-                                    <button
-                                        type="button"
-                                        className="action-btn watched-btn"
-                                        onClick={() =>
-                                            handleToggleWatched(movie.id)
-                                        }
-                                        title="Mark as watched"
-                                    >
-                                        <span className="material-symbols-rounded">
-                                            visibility
-                                        </span>
-                                        Watched
-                                    </button>
-
-                                    {/* Edit */}
-                                    <button
-                                        type="button"
-                                        className="icon-btn edit-btn"
-                                        onClick={() =>
-                                            handleStartEdit(movie)
-                                        }
-                                        title="Edit movie"
-                                        aria-label={`Edit ${movie.title}`}
-                                    >
-                                        <span className="material-symbols-rounded">
-                                            edit
-                                        </span>
-                                    </button>
-
-                                    {/* Delete */}
-                                    <button
-                                        type="button"
-                                        className="icon-btn delete-btn"
-                                        onClick={() =>
-                                            handleDelete(movie.id)
-                                        }
-                                        title="Delete movie"
-                                        aria-label={`Delete ${movie.title}`}
-                                    >
-                                        <span className="material-symbols-rounded">
-                                            delete
-                                        </span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                            movie={movie}
+                            isWatched={false}
+                            isEditing={editingId === movie.id}
+                            editText={editText}
+                            onEditTextChange={setEditText}
+                            onSaveEdit={handleSaveEdit}
+                            onCancelEdit={handleCancelEdit}
+                            onStartEdit={handleStartEdit}
+                            onDelete={handleDelete}
+                            onToggleWatched={handleToggleWatched}
+                            onRate={handleRating}
+                        />
                     ))}
                 </div>
             </section>
@@ -345,135 +268,20 @@ function StreamList() {
                     )}
 
                     {watchedMovies.map((movie) => (
-                        <div
+                        <MovieCard
                             key={movie.id}
-                            className="card streamlist-card watched-card"
-                        >
-                            <div className="movie-information">
-                                {movie.poster_path && (
-                                    <img
-                                        src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                                        alt={`${movie.title} poster`}
-                                        className="movie-poster"
-                                    />
-                                )}
-                                {renderMovieTitle(movie)}
-
-                                {editingId !== movie.id && (
-                                    <div
-                                        className="rating-form"
-                                        role="group"
-                                        aria-label={`Rate ${movie.title}`}
-                                    >
-                                        <span className="rating-question">
-                                            Did you like it?
-                                        </span>
-
-                                        {/* Like */}
-                                        <button
-                                            type="button"
-                                            className={
-                                                movie.rating === "liked"
-                                                    ? "rating-btn liked selected"
-                                                    : "rating-btn liked"
-                                            }
-                                            onClick={() =>
-                                                handleRating(
-                                                    movie.id,
-                                                    "liked"
-                                                )
-                                            }
-                                            title="I liked this movie"
-                                            aria-label={`Like ${movie.title}`}
-                                            aria-pressed={
-                                                movie.rating === "liked"
-                                            }
-                                        >
-                                            <span className="material-symbols-rounded">
-                                                sentiment_satisfied
-                                            </span>
-                                            Like
-                                        </button>
-
-                                        {/* Dislike */}
-                                        <button
-                                            type="button"
-                                            className={
-                                                movie.rating === "disliked"
-                                                    ? "rating-btn disliked selected"
-                                                    : "rating-btn disliked"
-                                            }
-                                            onClick={() =>
-                                                handleRating(
-                                                    movie.id,
-                                                    "disliked"
-                                                )
-                                            }
-                                            title="I did not like this movie"
-                                            aria-label={`Dislike ${movie.title}`}
-                                            aria-pressed={
-                                                movie.rating === "disliked"
-                                            }
-                                        >
-                                            <span className="material-symbols-rounded">
-                                                sentiment_dissatisfied
-                                            </span>
-                                            Dislike
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-
-                            {editingId !== movie.id && (
-                                <div className="movie-actions">
-
-                                    {/* Move back */}
-                                    <button
-                                        type="button"
-                                        className="action-btn move-back-btn"
-                                        onClick={() =>
-                                            handleToggleWatched(movie.id)
-                                        }
-                                        title="Move back to Want to Watch"
-                                    >
-                                        <span className="material-symbols-rounded">
-                                            undo
-                                        </span>
-                                        Move Back
-                                    </button>
-
-                                    {/* Edit */}
-                                    <button
-                                        type="button"
-                                        className="icon-btn edit-btn"
-                                        onClick={() =>
-                                            handleStartEdit(movie)
-                                        }
-                                        title="Edit movie"
-                                        aria-label={`Edit ${movie.title}`}
-                                    >
-                                        <span className="material-symbols-rounded">
-                                            edit
-                                        </span>
-                                    </button>
-
-                                    {/* Delete */}
-                                    <button
-                                        type="button"
-                                        className="icon-btn delete-btn"
-                                        onClick={() =>
-                                            handleDelete(movie.id)
-                                        }
-                                        title="Delete movie"
-                                        aria-label={`Delete ${movie.title}`}
-                                    >
-                                        <span className="material-symbols-rounded">
-                                            delete
-                                        </span>
-                                    </button>
-                                </div>
-                            )}
-                        </div>
+                            movie={movie}
+                            isWatched={true}
+                            isEditing={editingId === movie.id}
+                            editText={editText}
+                            onEditTextChange={setEditText}
+                            onSaveEdit={handleSaveEdit}
+                            onCancelEdit={handleCancelEdit}
+                            onStartEdit={handleStartEdit}
+                            onDelete={handleDelete}
+                            onToggleWatched={handleToggleWatched}
+                            onRate={handleRating}
+                        />
                     ))}
                 </div>
             </section>
