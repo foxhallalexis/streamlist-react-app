@@ -1,9 +1,20 @@
+import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import "./Navbar.css";
 
 function Navbar() {
     const location = useLocation();
-
+    const [cartCount, setCartCount] = useState(0);
+    useEffect(() => {
+        const savedCart = localStorage.getItem("cart");
+        const cart = savedCart ? JSON.parse(savedCart) : [];
+        const totalItems = cart.reduce(
+            (total, item) => total + item.quantity,
+            0
+        );
+        setCartCount(totalItems);
+    }, [location]);
+    
     return (
         <nav className="navbar">
             <img

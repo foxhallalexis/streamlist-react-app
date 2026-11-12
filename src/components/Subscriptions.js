@@ -1,6 +1,8 @@
+import { useState } from "react";
 import "./Subscriptions.css";
 
 function Subscriptions () {
+    const [warning, setWarning] = useState("");
     const subscriptionPlans = [
         {
             id: "subscription-basic",
@@ -27,22 +29,37 @@ function Subscriptions () {
 
     const addSubscriptionToCart = (subscription) => {
         const savedCart = localStorage.getItem("cart");
-        let cart = savedCart ? JSON.parse(savedCart) : [];
+        const cart = savedCart ? JSON.parse(savedCart) : [];
 
-        /* Remove any subscription already in the cart */
-        cart = cart.filter((item) => item.type !== "subscription");
-        /* Add selected subscription */
-        cart.push({
-            ...subscription,
-            quantity: 1
-        });
-        localStorage.setItem("cart", JSON.stringify(cart));
+        const existingSubscription = cart.find(
+            (item) => item.type === "subscription"
+        );
+        if (existingSubscription) {
+            setWarning(`You already have a subscription (${existingSubscription.name}) in your cart. Only one subscription can be added at a time.`);
+            return;
+        }
+
+        const updatedCart = [
+            ...cart,
+            {
+                ...subscription,
+                quantity: 1
+            }
+        ];
+
+        localStorage.setItem("cart", JSON.stringify(updatedCart));
+        setWarning(""); // Clear any previous warning
+
     };
 
     return (
         <main className="subscriptions-page">
             <h1>Choose Your Subscriptions</h1>
             <p>Select the plan that works best for you.</p>
+            {warning && (
+                <p className="subscription-warning">{warning}</p>
+            )}
+            
             <div className="subscription-plans">
                 {subscriptionPlans.map((plan) => (
                     <div className="subscription-card" key={plan.id}>

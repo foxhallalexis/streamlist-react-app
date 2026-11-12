@@ -14,7 +14,7 @@ function Cart() {
 
     const increaseQuantity = (id) => {
         const updatedCart = cartItems.map((item) =>
-            item.id === id
+            item.id === id && item.type !== "subscription"
                 ? { ...item, quantity: item.quantity + 1 }
                 : item
         );
@@ -24,7 +24,8 @@ function Cart() {
 
     const decreaseQuantity = (id) => {
         const updatedCart = cartItems.map((item) =>
-            item.id === id && item.quantity > 1
+            item.id === id && 
+item.type !== "subscription" && item.quantity > 1
                 ? { ...item, quantity: item.quantity - 1 }
                 : item
         );
@@ -33,16 +34,17 @@ function Cart() {
     };
 
     const removeItem = (id) => {
-        const updatedCart = cartItems.filter(
-            (item) => item.id !== id
-        );
-
+        const updatedCart = cartItems.filter((item) => item.id !== id);
         updateCart(updatedCart);
     };
 
+    const totalItems = cartItems.reduce(
+        (total, item) => total + item.quantity,
+        0
+    );
+
     const cartTotal = cartItems.reduce(
-        (total, item) =>
-            total + Number(item.price) * item.quantity,
+        (total, item) => total + Number(item.price) * item.quantity,
         0
     );
 
@@ -121,6 +123,7 @@ function Cart() {
                     ))}
 
                     <div className="cart-summary">
+                        <p>Total Items: {totalItems}</p>
                         <h2>
                             Cart Total: ${cartTotal.toFixed(2)}
                         </h2>
